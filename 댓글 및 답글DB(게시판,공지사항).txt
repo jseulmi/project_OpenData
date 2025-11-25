@@ -107,13 +107,60 @@ CREATE INDEX idx_nbc_parent ON notice_board_comment(parent_comment_no);
 
 COMMIT;
 
+-- ===============================
+-- 댓글 삭제 프로시저 생성 (부모 댓글 삭제 시 자식 답글들도 함께 삭제)
+-- ===============================
+
+-- 게시판 댓글 삭제 프로시저 (소프트 삭제 - 부모와 모든 자식 답글 포함)
+CREATE OR REPLACE PROCEDURE delete_board_comment(
+    p_comment_no IN NUMBER
+) IS
+BEGIN
+    -- 부모 댓글과 모든 자식 답글들을 재귀적으로 찾아서 삭제
+    UPDATE post_board_comment
+    SET is_deleted = 'Y'
+    WHERE comment_no IN (
+        SELECT comment_no
+        FROM post_board_comment
+        START WITH comment_no = p_comment_no
+        CONNECT BY PRIOR comment_no = parent_comment_no
+    );
+    
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END delete_board_comment;
+/
+
+-- 공지사항 댓글 삭제 프로시저 (소프트 삭제 - 부모와 모든 자식 답글 포함)
+CREATE OR REPLACE PROCEDURE delete_notice_comment(
+    p_comment_no IN NUMBER
+) IS
+BEGIN
+    -- 부모 댓글과 모든 자식 답글들을 재귀적으로 찾아서 삭제
+    UPDATE notice_board_comment
+    SET is_deleted = 'Y'
+    WHERE comment_no IN (
+        SELECT comment_no
+        FROM notice_board_comment
+        START WITH comment_no = p_comment_no
+        CONNECT BY PRIOR comment_no = parent_comment_no
+    );
+    
+    COMMIT;
+EXCEPTION
+    WHEN OTHERS THEN
+        ROLLBACK;
+        RAISE;
+END delete_notice_comment;
+/
 
 
--- 댓글 삭제
-DELETE FROM notice_board_comment;
-
+-- 전체 댓글 삭제
+DELETE FROM post_board_comment;
 COMMIT;
-
 
 -- 게시판 댓글 전체 조회
 SELECT
@@ -127,7 +174,6 @@ SELECT
 FROM post_board_comment
 ORDER BY comment_no DESC;
 
-
 -- 공지사항 댓글 전체 조회
 SELECT
     comment_no,
@@ -139,5 +185,6 @@ SELECT
     is_deleted
 FROM notice_board_comment
 ORDER BY comment_no DESC;
+
 
 
