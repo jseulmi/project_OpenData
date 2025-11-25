@@ -1,0 +1,44 @@
+-- 1:1 문의 테이블 생성
+CREATE TABLE od_inquiry (
+    inquiry_id NUMBER PRIMARY KEY,
+    user_id VARCHAR2(50) NOT NULL,
+    title VARCHAR2(200) NOT NULL,
+    content CLOB NOT NULL,
+    status VARCHAR2(20) DEFAULT '대기중',  -- '대기중', '답변완료'
+    created_date DATE DEFAULT SYSDATE,
+    updated_date DATE DEFAULT SYSDATE,
+    CONSTRAINT fk_inquiry_user FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- 답변 테이블 생성 (관리자 답변용)
+CREATE TABLE od_inquiry_reply (
+    reply_id NUMBER PRIMARY KEY,
+    inquiry_id NUMBER NOT NULL,
+    admin_id VARCHAR2(50),  -- 관리자 ID (필요시 users 테이블에 관리자 구분 컬럼 추가)
+    reply_content CLOB NOT NULL,
+    created_date DATE DEFAULT SYSDATE,
+    CONSTRAINT fk_reply_inquiry FOREIGN KEY (inquiry_id) REFERENCES inquiry(inquiry_id) ON DELETE CASCADE
+);
+
+-- 시퀀스 생성
+CREATE SEQUENCE od_inquiry_seq START WITH 1 INCREMENT BY 1;
+CREATE SEQUENCE od_inquiry_reply_seq START WITH 1 INCREMENT BY 1;
+
+
+
+-- 문의와 답변을 함께 조회
+SELECT 
+    i.inquiry_id,
+    i.user_id,
+    i.title,
+    i.content,
+    i.status,
+    i.created_date,
+    i.updated_date,
+    r.reply_id,
+    r.admin_id,
+    r.reply_content as reply_content,
+    r.created_date as reply_date
+FROM od_inquiry i
+LEFT JOIN od_inquiry_reply r ON i.inquiry_id = r.inquiry_id
+ORDER BY i.created_date DESC;
