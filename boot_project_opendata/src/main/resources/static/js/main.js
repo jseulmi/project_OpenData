@@ -43,60 +43,6 @@ function initChatbot() {
   }
 }
 
-// 지도 초기화 함수 (실제 kakao.maps 사용 코드로 대체하세요)
-function initMap() {
-  const mapContainer = document.getElementById('kakao-map');
-  window.map = new kakao.maps.Map(mapContainer, { center: new kakao.maps.LatLng(37.5665, 126.9780), level: 7 });
-  window.geocoder = new kakao.maps.services.Geocoder();
-  window.currentOverlay = null;
-  window.currentStationName = null;
-  window.markers = [];
-
-  // 지도 클릭 이벤트 (정보창 닫기)
-  kakao.maps.event.addListener(window.map, 'click', function() {
-    if (window.currentOverlay) {
-      window.currentOverlay.setMap(null);
-      window.currentOverlay = null;
-      window.currentStationName = null;
-    }
-  });
-}
-
-// 기타 컨트롤 초기화 (검색, 내위치, 새로고침 등)
-function initControls() {
-  document.getElementById('btnSearch').addEventListener('click', () => {
-    const query = document.getElementById('searchInput').value.trim();
-    if (!query) return toast('검색어를 입력하세요');
-    window.geocoder.addressSearch(query, (res, status) => {
-      if (status === kakao.maps.services.Status.OK) {
-        const latlng = new kakao.maps.LatLng(res[0].y, res[0].x);
-        window.map.setCenter(latlng);
-        window.map.setLevel(5);
-      } else toast('검색 결과가 없습니다');
-    });
-  });
-
-  document.getElementById('btnMyPos').addEventListener('click', () => {
-    const fixedLat = 35.1487052773634;
-    const fixedLng = 129.058893902842;
-    const latlng = new kakao.maps.LatLng(fixedLat, fixedLng);
-    window.map.setCenter(latlng);
-    window.map.setLevel(4);
-
-    if (!window.myMarker) {
-      window.myMarker = new kakao.maps.Marker({ position: latlng, map: window.map });
-    } else {
-      window.myMarker.setPosition(latlng);
-    }
-    toast('내 위치로 이동했습니다');
-  });
-
-  document.getElementById('btnRefresh').addEventListener('click', loadAllStations);
-  window.addEventListener('load', loadAllStations);
-}
-
-// 기타 이벤트들 (관심지역, 측정소 세부보기 등) 여기에 추가 가능
-
 // 메시지 전송 함수
 function sendUserMessage(message) {
   if (!message.trim()) return;
