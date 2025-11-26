@@ -14,5 +14,6 @@
 		<mapper resource="mybatis/mappers/station.xml"/>
 		<mapper resource="mybatis/mappers/Board.xml"/>
 		<mapper resource="mybatis/mappers/BoardAttach.xml"/>
+		<mapper resource="mybatis/mappers/InquiryMapper.xml"/>
 	</mappers>
 </configuration>
