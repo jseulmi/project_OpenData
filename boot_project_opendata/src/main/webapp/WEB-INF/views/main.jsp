@@ -360,7 +360,7 @@
     let currentOverlay = null, currentStationName = null;
     const markers = [];
 
-    const isLoggedIn = ${not empty sessionScope.loginId};
+   
 
     // ✅ 지도 클릭 이벤트 등록 (정보창 닫기)
     kakao.maps.event.addListener(map, 'click', function() {
