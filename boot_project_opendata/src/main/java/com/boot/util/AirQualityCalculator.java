@@ -1,76 +1,76 @@
 package com.boot.util;
 
-import com.boot.dto.StationDTO;
-import java.util.*;
-
+import com.boot.dto.AirQualityDTO;
 import org.springframework.stereotype.Component;
+
+import java.util.*;
 
 @Component
 public class AirQualityCalculator {
 
-    // 지역별 CAI 평균 계산
-    public Map<String, StationDTO> calculateCityAverages(List<StationDTO> stations) {
-        Map<String, List<StationDTO>> grouped = new HashMap<>();
+    /**
+     * 시도별 평균 계산
+     */
+    public Map<String, AirQualityDTO> calculateSidoAverages(List<AirQualityDTO> list) {
 
-        // 시/도 단위로 그룹화 (서울특별시, 부산광역시 등)
-        for (StationDTO s : stations) {
-            String cityKey = extractCityName(s.getStationName());
-            grouped.computeIfAbsent(cityKey, k -> new ArrayList<>()).add(s);
+        Map<String, List<AirQualityDTO>> grouped = new HashMap<>();
+
+        for (AirQualityDTO s : list) {
+            String sido = s.getSidoName();
+            if (sido == null || sido.isBlank()) continue;
+
+            grouped.computeIfAbsent(sido, k -> new ArrayList<>()).add(s);
         }
-        
-        List<String> cityOrder = Arrays.asList("서울", "부산", "대구", "인천", "광주", "대전", "울산", "제주");
-        
-        Map<String, StationDTO> result = new LinkedHashMap<>();
 
-        // 각 도시별 평균 및 CAI 계산
-        for (String city : cityOrder) {
-            List<StationDTO> list = grouped.get(city);
-            if (list == null || list.isEmpty()) continue;
+        // 시도 순서
+        List<String> sidoOrder = Arrays.asList(
+                "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
+                "경기", "강원", "충북", "충남", "전북", "전남", "경북", "경남", "제주"
+        );
 
-            double avgPm10 = list.stream().mapToInt(StationDTO::getPm10Value).average().orElse(0);
-            double avgPm25 = list.stream().mapToInt(StationDTO::getPm25Value).average().orElse(0);
-            double avgO3 = list.stream().mapToDouble(StationDTO::getO3Value).average().orElse(0);
-            double avgNo2 = list.stream().mapToDouble(StationDTO::getNo2Value).average().orElse(0);
-            double avgCo = list.stream().mapToDouble(StationDTO::getCoValue).average().orElse(0);
-            double avgSo2 = list.stream().mapToDouble(StationDTO::getSo2Value).average().orElse(0);
+        Map<String, AirQualityDTO> result = new LinkedHashMap<>();
 
+        for (String sido : sidoOrder) {
+            List<AirQualityDTO> rows = grouped.get(sido);
+            if (rows == null || rows.isEmpty()) continue;
+
+            double avgPm10 = rows.stream().mapToInt(AirQualityDTO::getPm10Value).average().orElse(0);
+            double avgPm25 = rows.stream().mapToInt(AirQualityDTO::getPm25Value).average().orElse(0);
+            double avgO3 = rows.stream().mapToDouble(AirQualityDTO::getO3Value).average().orElse(0);
+            double avgNo2 = rows.stream().mapToDouble(AirQualityDTO::getNo2Value).average().orElse(0);
+            double avgCo = rows.stream().mapToDouble(AirQualityDTO::getCoValue).average().orElse(0);
+            double avgSo2 = rows.stream().mapToDouble(AirQualityDTO::getSo2Value).average().orElse(0);
+
+            // CAI 등급
             int cai = Math.max(
-                Math.max(gradePm10(avgPm10), gradePm25(avgPm25)),
-                Math.max(Math.max(gradeO3(avgO3), gradeNo2(avgNo2)), Math.max(gradeCo(avgCo), gradeSo2(avgSo2)))
+                    Math.max(gradePm10(avgPm10), gradePm25(avgPm25)),
+                    Math.max(Math.max(gradeO3(avgO3), gradeNo2(avgNo2)),
+                             Math.max(gradeCo(avgCo), gradeSo2(avgSo2)))
             );
 
             String gradeText = getGradeText(cai);
 
-            StationDTO dto = new StationDTO();
-            dto.setStationName(city);
+            AirQualityDTO dto = new AirQualityDTO();
+            dto.setSidoName(sido);
+            dto.setStationName(sido);
+
             dto.setPm10Value((int) avgPm10);
             dto.setPm25Value((int) avgPm25);
             dto.setO3Value(avgO3);
             dto.setNo2Value(avgNo2);
             dto.setCoValue(avgCo);
             dto.setSo2Value(avgSo2);
-            dto.setAddr(gradeText);
 
-            result.put(city, dto);
+            dto.setKhaiGrade(cai);
+            dto.setKhaiValue(cai);
+            dto.setDataTime(gradeText);
+
+            result.put(sido, dto);
         }
 
         return result;
     }
 
-    // 시/도 이름만 추출 (예: "서울특별시 강남구" → "서울")
-    private String extractCityName(String fullName) {
-        if (fullName.startsWith("서울")) return "서울";
-        if (fullName.startsWith("부산")) return "부산";
-        if (fullName.startsWith("대구")) return "대구";
-        if (fullName.startsWith("인천")) return "인천";
-        if (fullName.startsWith("광주")) return "광주";
-        if (fullName.startsWith("대전")) return "대전";
-        if (fullName.startsWith("울산")) return "울산";
-        if (fullName.startsWith("제주")) return "제주";
-        return "기타";
-    }
-
-    // 지수 계산 (단순 등급화)
     private int gradePm10(double v) {
         if (v <= 30) return 50;
         if (v <= 80) return 100;
