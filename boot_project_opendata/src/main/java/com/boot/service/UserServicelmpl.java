@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.boot.dao.FavoriteStationDAO;
@@ -20,15 +21,20 @@ public class UserServicelmpl implements UserService {
 	private SqlSessionTemplate sqlSession;
 	@Autowired
     private UserDAO userDAO;
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	/** 로그인 검증: users.user_pw를 읽어와 비교 (현 상태 유지) */
+	@Override
 	public boolean loginYn(Map<String, String> param) {
-		// mapper: loginYn -> 비밀번호만 조회
-		String dbPw = (String) sqlSession.selectOne("com.boot.dao.UserDAO.loginYn", param);
-		if (dbPw == null)
-			return false;
-		String inputPw = param.get("user_pw");
-		return dbPw.equals(inputPw);
+	    String dbPw = sqlSession.selectOne("com.boot.dao.UserDAO.loginYn", param);
+	    if (dbPw == null) 
+	    	return false;
+
+	    String inputPw = param.get("user_pw");
+
+	    // 암호화된 비밀번호 매칭
+	    return passwordEncoder.matches(inputPw, dbPw);
 	}
 
 	/** 마이페이지 조회 */
@@ -59,9 +65,13 @@ public class UserServicelmpl implements UserService {
 
 
 	/** 회원가입 로직 */
+	@Override
 	public int register(Map<String, String> param) {
-		// User.xml 의 <insert id="register"> 문 실행
-		return sqlSession.insert("com.boot.dao.UserDAO.register", param);
+	    String rawPw = param.get("user_pw");          // 입력된 비번
+	    String encodedPw = passwordEncoder.encode(rawPw);  // 암호화
+	    param.put("user_pw", encodedPw);              // 암호화된 비번 저장
+	    
+	    return sqlSession.insert("com.boot.dao.UserDAO.register", param);
 	}
 
 	public int withdraw(Map<String, String> param) {
