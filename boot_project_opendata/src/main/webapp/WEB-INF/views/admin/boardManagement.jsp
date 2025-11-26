@@ -126,14 +126,14 @@
       <div class="board-header">
 		<!-- ✅ 게시판 제목 + 선택창을 같은 줄로 배치 -->
 		<div style="display: inline-flex; align-items: center; gap: 8px;">
-		  <h1 class="board-title" style="margin: 0;">게시판</h1>
+		  <h1 class="board-title" style="margin: 0;">게시판 관리</h1>
 	
 		  <div class="board-filter">
 		    <select id="boardType" name="boardType" class="board-select" onchange="moveToBoardPage(this.value)">
 		      <option value="">선택하세요</option>
 		      <option value="board">게시판 관리</option>
 		      <option value="notice">공지사항 관리</option>
-		      <option value="qna">Q&A 관리</option>
+		      <option value="inquiry">1:1 문의 관리</option>
 		    </select>
 		  </div>
 		</div>
@@ -251,8 +251,8 @@
 	    location.href = "/boardManagement";
 	  } else if (type === "notice") {
 	    location.href = "/noticeManagement";
-	  } else if (type === "qna") {
-		location.href = "/qnaManagement";
+	  } else if (type === "inquiry") {
+		location.href = "/admin/inquiryManagement";
 	  } 
 	}
   </script>

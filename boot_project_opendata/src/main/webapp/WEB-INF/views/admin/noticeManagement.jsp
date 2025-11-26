@@ -131,7 +131,7 @@
               <option value="">선택하세요</option>
               <option value="board">게시판 관리</option>
               <option value="notice" selected>공지사항 관리</option>
-              <option value="qna">Q&A 관리</option>
+              <option value="inquiry">1:1 문의 관리</option>
             </select>
           </div>
         </div>
@@ -228,9 +228,9 @@
         location.href = "/boardManagement";
       } else if (type === "notice") {
         location.href = "/noticeManagement";
-      } else if (type === "qna") {
-        location.href = "/qnaManagement";
-      }
+	  } else if (type === "inquiry") {
+		location.href = "/admin/inquiryManagement";
+	  } 
     }
   </script>
 </body>
