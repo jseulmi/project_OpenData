@@ -20,7 +20,9 @@
 
 	<!-- 	아이디 중복 체크 -->
 	<select id="checkId" parameterType="string" resultType="int">
-		select count(*) from opendata_users where user_id = #{user_id}
+    select count(*) 
+    from opendata_users 
+    where user_id = #{user_id}
 	</select>
 
 	<!--     이메일 중복 체크 -->
