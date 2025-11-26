@@ -1,5 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -18,6 +19,77 @@
   <script src="/js/banner.js"></script>
   <!-- ✅ CSS 파일 링크 -->
   <link rel="stylesheet" href="<c:url value='/css/main.css'/>">
+  <style>
+	.compare-btn {
+	  width: 100%;
+	  background: #2563eb;
+	  color: white;
+	  padding: 8px 0;
+	  margin-top: 12px;
+	  border-radius: 6px;
+	  border: none;
+	  cursor: pointer;
+	  font-weight: 600;
+	}
+
+	.compare-btn:hover {
+	  background: #1d4ed8;
+	}
+	.compare-panel {
+	  position: fixed;
+	  bottom: 20px;
+	  right: 20px;
+	  width: 350px;
+	  background: white;
+	  border-radius: 12px;
+	  box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+	  padding: 15px;
+	  z-index: 9999;
+	}
+
+	.compare-header {
+	  display: flex;
+	  justify-content: space-between;
+	  font-weight: bold;
+	  margin-bottom: 12px;
+	  font-size: 16px;
+	}
+
+	.compare-header button {
+	  border: none;
+	  background: none;
+	  cursor: pointer;
+	  font-size: 18px;
+	}
+
+	.compare-table {
+	  width: 100%;
+	  border-collapse: collapse;
+	}
+
+	.compare-table th,
+	.compare-table td {
+	  padding: 6px 4px;
+	  border-bottom: 1px solid #eee;
+	  text-align: right;
+	}
+
+	.compare-table th {
+	  text-align: left;
+	  font-weight: 600;
+	  color: #333;
+	}
+
+	.highlight-good { color: #22c55e; font-weight: bold; }
+	.highlight-bad  { color: #ef4444; font-weight: bold; }
+
+	.compare-select-info {
+	  font-size: 13px;
+	  margin-bottom: 10px;
+	  color: #666;
+	}
+	
+  </style>
 </head>
 <body>
   <!-- 헤더 & 네비 -->
@@ -95,12 +167,10 @@
       </div>
     </div>
   </div>
-
   <main>
    <h2 class="section-title">실시간 대기질 정보</h2>
     <!-- 카카오 지도 섹션 (코드1의 고급 지도 기능) -->
    <section class="map-section">
-
      <div class="map-wrapper">
        <div id="kakao-map"></div>
       <div id="loading" style="
@@ -116,7 +186,7 @@
         display: none;">
         데이터 로딩중...
       </div>
-
+		
        <!-- 지도 위 오버레이 -->
        <div class="map-overlay">
          <div class="overlay-search">
@@ -125,7 +195,9 @@
            <button id="btnMyPos">내 위치</button>
            <button id="btnRefresh">새로고침</button>
          </div>
-
+		 <button id="btnPolygonMode">폴리곤 모드</button>
+		 <button id="btnNormalMode" style="display:none;">일반 모드</button>
+		 
          <div class="overlay-left">
            <h3>대기질 등급</h3>
            <ul>
@@ -154,17 +226,18 @@
 	            <h3 class="city-name">${city.stationName}</h3>
 
 	            <c:choose>
-	              <c:when test="${city.addr eq '좋음'}">
-	                <span class="city-grade good">좋음</span>
-	              </c:when>
-	              <c:when test="${city.addr eq '보통'}">
-	                <span class="city-grade normal">보통</span>
-	              </c:when>
-	              <c:when test="${city.addr eq '나쁨'}">
-	                <span class="city-grade bad">나쁨</span>
-	              </c:when>
-	              <c:otherwise>
-	                <span class="city-grade very-bad">매우나쁨</span>
+					<c:when test="${city.khaiGrade <= 50}">
+					    <span class="city-grade good">좋음</span>
+					</c:when>
+					<c:when test="${city.khaiGrade <= 100}">
+					    <span class="city-grade normal">보통</span>
+					</c:when>
+					<c:when test="${city.khaiGrade <= 250}">
+					    <span class="city-grade bad">나쁨</span>
+					</c:when>
+					<c:otherwise>
+					    <span class="city-grade very-bad">매우나쁨</span>
+					</span>
 	              </c:otherwise>
 	            </c:choose>
 	          </div>
@@ -219,6 +292,10 @@
        </div>
      </div>
    </section>
+   <div class="top-download-bar">
+      <button id="btnCsv" class="download-btn">CSV 다운로드</button>
+      <button id="btnExcel" class="download-btn">Excel 다운로드</button>
+  </div>
     <!-- 대기질 등급 안내 섹션 -->
     <section class="grade-guide-section">
       <div class="grade-guide-container">
@@ -320,8 +397,7 @@
       try {
         const response = await fetch('/api/air/stations');
         if (!response.ok) throw new Error('API 호출 실패 ' + response.status);
-        const json = await response.json();
-        const stations = json?.response?.body?.items || [];
+		const stations = await response.json();   // 🚀 리스트 직접 받기!
         displayStations(stations);
         toast('측정소 ' + stations.length + '개 로드 완료');
       } catch(e) {
@@ -353,22 +429,26 @@
       });
     }
 
-    async function loadStationDetail(stationName, position) {
-      showLoading(true);
-      try {
-        const res = await fetch('/api/air/station/' + encodeURIComponent(stationName));
-        const json = await res.json();
-        const item = json?.response?.body?.items?.[0];
-        if (!item) { toast('측정 데이터를 불러올 수 없습니다'); return; }
-        showInfoWindow(stationName, item, position);
-      } catch(e) {
-        console.error(e);
-        toast('데이터 로드 실패');
-      } finally {
-        showLoading(false);
-      }
-    }
+	async function loadStationDetail(stationName, position) {
+	  showLoading(true);
+	  try {
 
+	    const res = await fetch('/api/air/station/' + encodeURIComponent(stationName));
+	    if (!res.ok) throw new Error("상세 API 오류");
+
+	    const json = await res.json();
+	    const item = json.response.body.items[0];
+
+	    if (!item) { toast('측정 데이터를 불러올 수 없습니다'); return; }
+
+	    showInfoWindow(stationName, item, position);
+	  } catch(e) {
+	    console.error(e);
+	    toast('데이터 로드 실패');
+	  } finally {
+	    showLoading(false);
+	  }
+	}
     function getGradeText(grade) {
       const grades = { '1': '좋음', '2': '보통', '3': '나쁨', '4': '매우나쁨' };
       return grades[grade] || '-';
@@ -441,7 +521,7 @@
        
        return false;  // ✅ 추가
      };
-     
+	 
      // ✅ mousedown도 차단
      favSpan.onmousedown = function(e) {
        e.preventDefault();
@@ -452,7 +532,7 @@
      titleDiv.appendChild(titleSpan);
      titleDiv.appendChild(favSpan);
      content.appendChild(titleDiv);
-
+	
      function createInfoItem(label, value, gradeClass) {
        const item = document.createElement('div');
        item.className = 'info-item';
@@ -470,12 +550,21 @@
        return item;
      }
 
-     content.appendChild(createInfoItem('미세먼지(PM10)', (data.pm10Value || '-') + '㎍/m³ (' + getGradeText(data.pm10Grade) + ')', getGradeClass(data.pm10Grade)));
-     content.appendChild(createInfoItem('초미세먼지(PM2.5)', (data.pm25Value || '-') + '㎍/m³ (' + getGradeText(data.pm25Grade) + ')', getGradeClass(data.pm25Grade)));
-     content.appendChild(createInfoItem('오존(O₃)', (data.o3Value || '-') + 'ppm (' + getGradeText(data.o3Grade) + ')', getGradeClass(data.o3Grade)));
-     content.appendChild(createInfoItem('이산화질소(NO₂)', (data.no2Value || '-') + 'ppm (' + getGradeText(data.no2Grade) + ')', getGradeClass(data.no2Grade)));
-     content.appendChild(createInfoItem('일산화탄소(CO)', (data.coValue || '-') + 'ppm', ''));
-     content.appendChild(createInfoItem('아황산가스(SO₂)', (data.so2Value || '-') + 'ppm', ''));
+     content.appendChild(createInfoItem('미세먼지(PM10)', fmt(data.pm10Value || '-') + '㎍/m³ (' + getGradeText(data.pm10Grade) + ')', getGradeClass(data.pm10Grade)));
+     content.appendChild(createInfoItem('초미세먼지(PM2.5)', fmt(data.pm25Value || '-') + '㎍/m³ (' + getGradeText(data.pm25Grade) + ')', getGradeClass(data.pm25Grade)));
+	 content.appendChild(createInfoItem(
+	   '오존(O₃)',
+	   fmt(data.o3Value || '-') + 'ppm (' + getGradeText(String(data.o3Grade)) + ')',
+	   getGradeClass(String(data.o3Grade))
+	 ));
+
+	 content.appendChild(createInfoItem(
+	   '이산화질소(NO₂)',
+	   fmt(data.no2Value || '-') + 'ppm (' + getGradeText(String(data.no2Grade)) + ')',
+	   getGradeClass(String(data.no2Grade))
+	 ));
+     content.appendChild(createInfoItem('일산화탄소(CO)', fmt(data.coValue || '-') + 'ppm', ''));
+     content.appendChild(createInfoItem('아황산가스(SO₂)', fmt(data.so2Value || '-') + 'ppm', ''));
 
      const timeDiv = document.createElement('div');
      timeDiv.style.marginTop = '10px';
@@ -483,7 +572,14 @@
      timeDiv.style.color = '#999';
      timeDiv.textContent = '측정시간: ' + (data.dataTime || '-');
      content.appendChild(timeDiv);
+	
+	 const compareBtn = document.createElement("button");
+	 compareBtn.className = "compare-btn";
+	 compareBtn.textContent = "상세보기";
+	 compareBtn.onclick = () => addToCompare(stationName, data);
 
+	 content.appendChild(compareBtn);
+	 
      const overlay = new kakao.maps.CustomOverlay({
        position, 
        content, 
@@ -550,6 +646,158 @@
 
     document.getElementById('btnRefresh').addEventListener('click', loadAllStations);
     window.addEventListener('load', loadAllStations);
+	
+	document.getElementById("btnCsv").addEventListener("click", () => {
+	    window.location.href = "/api/air/download/csv";
+	});
+
+	document.getElementById("btnExcel").addEventListener("click", () => {
+	    window.location.href = "/api/air/download/excel";
+	});
+	
+<!--	숫자 포맷팅 함수 -->
+	function fmt(n) {
+	    const num = Number(n);
+	    return isNaN(num) ? '-' : Number(num.toFixed(3));
+	}
+
+	let pmSidoAvg = {};
+	try {
+	    pmSidoAvg = JSON.parse('${sidoAvgJson}');
+	    console.log("시도 평균 데이터:", pmSidoAvg);
+	} catch (e) {
+	    console.error("❌ 시도 평균 JSON 파싱 실패:", e);
+	}
+
+
+	/* =========================================================
+	   2) 시도 등급 → 색상 변환
+	   ========================================================= */
+	function getColorByGrade(grade) {
+	    if (grade === "매우나쁨") return "#ff0000";   // 빨강
+	    if (grade === "나쁨") return "#ff7f00";       // 주황
+	    if (grade === "보통") return "#52c41a";       // 초록
+	    return "#3b82f6";                             // 파랑 (좋음)
+	}
+
+
+	/* =========================================================
+	   3) GeoJSON 시도명 → 평균맵 키 변환
+	      (서울특별시 → 서울, 경상북도 → 경북)
+	   ========================================================= */
+	function normalizeSido(name) {
+	    if (!name) return null;
+
+		// 광역시
+	    if (name.includes("서울특별시") || name.includes("서울")) return "서울";
+	    if (name.includes("부산광역시") || name.includes("부산")) return "부산";
+	    if (name.includes("대구광역시") || name.includes("대구")) return "대구";
+	    if (name.includes("인천광역시") || name.includes("인천")) return "인천";
+	    if (name.includes("광주광역시") || name.includes("광주")) return "광주";
+	    if (name.includes("대전광역시") || name.includes("대전")) return "대전";
+	    if (name.includes("울산광역시") || name.includes("울산")) return "울산";
+	    if (name.includes("세종특별자치시") || name.includes("세종")) return "세종";
+
+	    // 도
+	    if (name.includes("경기도") || name.includes("경기")) return "경기";
+	    if (name.includes("강원도") || name.includes("강원")) return "강원";
+
+	    if (name.includes("충청북도") || name.includes("충북")) return "충북";
+	    if (name.includes("충청남도") || name.includes("충남")) return "충남";
+
+	    if (name.includes("전라북도") || name.includes("전북")) return "전북";
+	    if (name.includes("전라남도") || name.includes("전남")) return "전남";
+
+	    if (name.includes("경상북도") || name.includes("경북")) return "경북";
+	    if (name.includes("경상남도") || name.includes("경남")) return "경남";
+
+	    if (name.includes("제주특별자치도") || name.includes("제주")) return "제주";
+
+	    return null;
+	}
+
+	function getGradeTextByKhai(khaiGrade) {
+	    if (khaiGrade <= 50) return "좋음";
+	    if (khaiGrade <= 100) return "보통";
+	    if (khaiGrade <= 250) return "나쁨";
+	    return "매우나쁨";
+	}
+	/* =========================================================
+	   4) 시도 경계 GeoJSON 받아서 폴리곤 그리기
+	   ========================================================= */
+	function drawSidoRegions(geojson) {
+
+	    geojson.features.forEach(feature => {
+
+	        const props = feature.properties;
+	        const sidoFull = props.CTP_KOR_NM;       // GeoJSON 시도이름 (예: 서울특별시)
+	        const sidoKey = normalizeSido(sidoFull); // 평균값 키 (예: 서울)
+
+	        if (!sidoKey) return;
+
+	        const avgObj = pmSidoAvg[sidoKey];
+	        if (!avgObj) return;
+
+			const grade = getGradeTextByKhai(avgObj.khaiGrade);
+			const fillColor = getColorByGrade(grade);
+
+	        const geom = feature.geometry;
+	        const coords = geom.coordinates;
+	        const paths = [];
+
+	        // polygon
+	        if (geom.type === "Polygon") {
+	            coords.forEach(poly => {
+	                paths.push(poly.map(c => new kakao.maps.LatLng(c[1], c[0])));
+	            });
+	        }
+	        // multipolygon
+	        else if (geom.type === "MultiPolygon") {
+	            coords.forEach(multi => {
+	                multi.forEach(poly => {
+	                    paths.push(poly.map(c => new kakao.maps.LatLng(c[1], c[0])));
+	                });
+	            });
+	        }
+
+	        // 실제 폴리곤 생성
+	        const polygon = new kakao.maps.Polygon({
+	            map: map,
+	            path: paths,
+	            strokeWeight: 2,
+	            strokeColor: "#222",
+	            strokeOpacity: 1,
+	            fillColor: fillColor,
+	            fillOpacity: 0.55
+	        });
+
+	        // 마우스 효과
+	        kakao.maps.event.addListener(polygon, "mouseover", () => {
+	            polygon.setOptions({ fillOpacity: 0.8 });
+	        });
+
+	        kakao.maps.event.addListener(polygon, "mouseout", () => {
+	            polygon.setOptions({ fillOpacity: 0.55 });
+	        });
+
+	        kakao.maps.event.addListener(polygon, "click", () => {
+	            alert(`${sidoFull}\n등급 : ${grade}\nPM10 : ${avgObj.pm10Value} μg/m³`);
+	        });
+	    });
+	}
+
+
+	/* =========================================================
+	   5) GeoJSON 로딩 시작
+	   ========================================================= */
+	fetch("/geo/TL_SCCO_CTPRVN.json")
+	    .then(res => res.json())
+	    .then(json => {
+	        console.log("시도 GeoJSON 로드 완료");
+	        map.setLevel(10); // 시도 단위 잘 보이도록
+	        drawSidoRegions(json);
+	    })
+	    .catch(err => console.error("❌ 시도 GeoJSON 로드 실패:", err));
   </script>
 </body>
 </html>
