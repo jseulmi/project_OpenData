@@ -13,6 +13,13 @@
   <link rel="stylesheet" href="/css/boardWrite.css">
 </head>
 <body>
+<script>
+	  		      window.sessionExpireAt = ${sessionScope.sessionExpireAt == null ? 0 : sessionScope.sessionExpireAt};
+	  		      window.isLoggedIn = ${not empty sessionScope.loginId};
+	  		  </script>
+
+	  		  <script src="/js/sessionTimer.js"></script>
+
   <!-- 헤더 & 네비 -->
   <header>
     <nav class="nav" aria-label="주요 메뉴">
@@ -31,6 +38,11 @@
             <a href="<c:url value='/mypage'/>">마이페이지</a>
             <a href="<c:url value='/logout'/>">로그아웃</a>
             <span class="user-name">${sessionScope.loginDisplayName}님</span>
+            <!-- ⏱ 세션 타이머 -->
+			         <c:if test="${not empty sessionScope.loginId}">
+			             <span id="session-timer" style="margin-left:15px; font-weight:bold; font-size:16px; color:#333;">
+			             </span>
+			         </c:if>
           </c:otherwise>
         </c:choose>
       </div>
