@@ -175,7 +175,7 @@
         <a href="/main" class="nav-category">상세정보</a>
         <a href="/board/list" class="nav-board">게시판</a>
         <a href="/notice" class="nav-notice">공지사항</a>
-        <a href="/qna" class="nav-qna">QnA</a>
+		<a href="<c:url value='/inquiry'/>" class="nav-inquiry">1:1 문의</a>
       </div>
     </div>
   </div>
@@ -337,7 +337,31 @@
     </section>
 
   </main>
+  <!-- 챗봇 플로팅 버튼 -->
+    	<div id="chatbot-float-btn">
+    	  <button id="chatbotBtn" aria-label="챗봇 열기">
+    		<img src="/img/chatbot2.png" alt="챗봇 아이콘" style="width: 40px; height: 40px; bottom:20px;">
+    	  </button>
+    	</div>
 
+    	<!-- 챗봇 창(초기 숨김) -->
+    	<div id="chatbotModal" class="chatbot-modal" style="display:none;">
+    	  <div class="chatbot-window">
+
+    	    <!-- 닫기 버튼 -->
+    	    <button id="chatbotClose" class="chatbot-close">✕</button>
+
+    	    <!-- 대화 내용 -->
+    	    <div id="chatMessages" class="chat-messages"></div>
+
+    	    <!-- 입력 영역 -->
+    	    <div class="chat-input-box">
+    	      <input id="chatInput" type="text" placeholder="메시지를 입력하세요" />
+    	      <button id="sendBtn" class="chat-send-btn">전송</button>
+    	    </div>
+
+    	  </div>
+    	</div>
   <!-- 푸터 -->
   <footer class="footer">
     <h2>대기질 정보 시스템</h2>
@@ -349,7 +373,7 @@
     <a href="#">개인정보처리방침</a>
   </footer>
 
-
+  <script src="/js/main.js"></script>
   <script>
     const toast = (t)=>{ const m=document.getElementById('msg'); m.textContent=t; m.style.display='block'; setTimeout(()=>m.style.display='none',2500); };
     const showLoading = (b)=>{ document.getElementById('loading').style.display = b ? 'block' : 'none'; };
