@@ -131,7 +131,7 @@
 		  <div class="board-filter">
 		    <select id="boardType" name="boardType" class="board-select" onchange="moveToBoardPage(this.value)">
 		      <option value="">선택하세요</option>
-		      <option value="board">게시판 관리</option>
+		      <option value="board" selected>게시판 관리</option>
 		      <option value="notice">공지사항 관리</option>
 		      <option value="inquiry">1:1 문의 관리</option>
 		    </select>
