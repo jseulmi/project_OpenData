@@ -595,9 +595,11 @@
      content.appendChild(timeDiv);
 
 	 const compareBtn = document.createElement("button");
-	 compareBtn.className = "compare-btn";
-	 compareBtn.textContent = "상세보기";
-	 compareBtn.onclick = () => addToCompare(stationName, data);
+	     compareBtn.className = "compare-btn";
+	     compareBtn.textContent = "상세보기";
+	     compareBtn.onclick = () => {
+	         window.location.href = "/station/detail?name=" + encodeURIComponent(stationName);
+	     };
 
 	 content.appendChild(compareBtn);
 	 
