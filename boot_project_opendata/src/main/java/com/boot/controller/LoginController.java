@@ -3,6 +3,7 @@ package com.boot.controller;
 import com.boot.dto.Admin;
 import com.boot.dto.UserDTO;
 import com.boot.service.AdminService;
+import com.boot.service.MailService;
 import com.boot.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
@@ -23,11 +25,17 @@ import java.util.HashMap;
 @Controller
 public class LoginController {
     
+    private final MailService mailService;
+    
     @Autowired
     private AdminService adminService;
     
     @Autowired
     private UserService userService;
+
+    LoginController(MailService mailService) {
+        this.mailService = mailService;
+    }
     
     // 회원 로그인 페이지
     @GetMapping("/login")
@@ -144,31 +152,38 @@ public class LoginController {
     public String adminLogin(@RequestParam("username") String username,
                              @RequestParam("password") String password,
                              HttpSession session,
-                             HttpServletResponse response,
                              Model model) {
 
         try {
             Admin adminUser = adminService.authenticate(username, password);
+
             if (adminUser != null) {
-                session.setAttribute("loginDisplayName", adminUser.getName());
-                session.setAttribute("userId", adminUser.getId());
-                session.setAttribute("isAdmin", true);
-                session.setAttribute("role", "ADMIN");
+
+                // 1) OTP 생성
+                int otp = (int)(Math.random() * 900000) + 100000; // 6자리
                 
-                long expireAt = System.currentTimeMillis() + (30 * 60 * 1000);
-                session.setAttribute("sessionExpireAt", expireAt);
+                long expireAt = System.currentTimeMillis() + (3 * 60 * 1000); // 3분
+                session.setAttribute("adminOTPExpireAt", expireAt);
 
-                // 관리자도 로그인 시 remember-me 쿠키 삭제 (보안)
-                Cookie cookie = new Cookie("remember-me", null);
-                cookie.setMaxAge(0);
-                cookie.setPath("/");
-                response.addCookie(cookie);
+                // 2) 세션에 임시 저장 (로그인 확정 X)
+                session.setAttribute("tempAdminId", adminUser.getId());
+                session.setAttribute("tempAdminName", adminUser.getName());
+                session.setAttribute("adminOTP", otp);
+                session.setAttribute("tempAdminEmail", adminUser.getEmail());
+                
 
-                return "redirect:/adminMain";
+
+                // 3) 이메일로 전송
+                mailService.sendAdminOTP(adminUser.getEmail(), otp);
+
+
+                // 4) OTP 입력 페이지로 이동
+                return "redirect:/admin/otp";
             } else {
-                model.addAttribute("login_err", "아이디 또는 비밀번호가 일치하지 않습니다.");
+                model.addAttribute("login_err", "아이디 또는 비밀번호가 잘못되었습니다.");
                 return "adminLogin";
             }
+
         } catch (Exception e) {
             model.addAttribute("login_err", "로그인 처리 중 오류 발생");
             return "adminLogin";
@@ -204,4 +219,87 @@ public class LoginController {
 
         return "redirect:/main";
     }
+    @GetMapping("/admin/otp")
+    public String adminOTPPage() {
+    	return "admin/adminOTP"; // adminOTP.jsp 로 이동
+    }
+    
+    @PostMapping("/admin/otpCheck")
+    public String adminOTPCheck(@RequestParam("otp") String otpInput,
+                                HttpSession session,
+                                Model model) {
+
+        Object otpObj = session.getAttribute("adminOTP");
+        Long expireAt = (Long) session.getAttribute("adminOTPExpireAt");
+
+        // 🔥 OTP가 없거나 세션 만료된 경우
+        if (otpObj == null || expireAt == null) {
+            model.addAttribute("otp_err", "OTP 세션이 만료되었습니다. 다시 로그인해주세요.");
+            return "adminLogin";
+        }
+
+        // 🔥 3분 만료 체크
+        if (System.currentTimeMillis() > expireAt) {
+            session.removeAttribute("adminOTP");
+            session.removeAttribute("adminOTPExpireAt");
+
+            model.addAttribute("otp_err", "OTP 유효시간(3분)이 만료되었습니다. 다시 로그인해주세요.");
+            return "adminLogin";
+        }
+
+        int realOtp = (int) otpObj;
+
+        // 🔥 OTP 틀림
+        if (!otpInput.equals(String.valueOf(realOtp))) {
+            model.addAttribute("otp_err", "OTP 번호가 일치하지 않습니다.");
+            return "admin/adminOTP";
+        }
+
+        // 🔥 OTP 성공 → 관리자 정식 로그인 처리
+        session.removeAttribute("adminOTP");
+        session.removeAttribute("adminOTPExpireAt");
+
+        session.setAttribute("userId", session.getAttribute("tempAdminId"));
+        session.setAttribute("loginDisplayName", session.getAttribute("tempAdminName"));
+        session.setAttribute("isAdmin", true);
+        session.setAttribute("role", "ADMIN");
+
+        session.removeAttribute("tempAdminId");
+        session.removeAttribute("tempAdminName");
+
+        return "redirect:/adminMain";
+    }
+
+    
+    @PostMapping("/admin/resendOTP")
+    @ResponseBody
+    public Map<String, Object> resendOTP(HttpSession session) {
+
+        Map<String, Object> result = new HashMap<>();
+
+        String email = (String) session.getAttribute("tempAdminEmail");
+
+        if (email == null) {
+            result.put("status", "expired");
+            return result;
+        }
+
+        // 새 OTP
+        int otp = (int)(Math.random() * 900000) + 100000;
+        session.setAttribute("adminOTP", otp);
+
+        // 새 유효시간 (3분)
+        long expireAt = System.currentTimeMillis() + (3 * 60 * 1000);
+        session.setAttribute("adminOTPExpireAt", expireAt);
+
+        // 이메일 발송
+        mailService.sendAdminOTP(email, otp);
+
+        // 성공 응답 + 새 타이머 전달
+        result.put("status", "success");
+        result.put("expireAt", expireAt);
+
+        return result;
+    }
+    
 }
