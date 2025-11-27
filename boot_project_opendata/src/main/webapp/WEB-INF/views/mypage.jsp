@@ -96,7 +96,7 @@
         <a href="/main" class="nav-category">상세정보</a>
         <a href="/board/list" class="nav-board">게시판</a>
         <a href="/notice" class="nav-notice">공지사항</a>
-        <a href="/qna" class="nav-qna">QnA</a>
+        <a href="<c:url value='/inquiry'/>" class="nav-inquiry">1:1 문의</a>
       </div>
     </div>
   </div>
