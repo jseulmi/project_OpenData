@@ -26,7 +26,7 @@ public class AirQualityService {
     private static final String REDIS_KEY = "AIR:ALL_DATA";
 
     private static final String SERVICE_KEY =
-            "1d27195933022c5d508743e9b452e6e0d0e5c01b90cba5713fefef1e889396d8";
+            "a682a33e4881f5f1255dfa8b00d2fd6096c874effa3269244204a5e03f2d607b";
 
     private static final List<String> SIDO_LIST = List.of(
             "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종",
@@ -202,4 +202,5 @@ public class AirQualityService {
     
     
 }
+
 
