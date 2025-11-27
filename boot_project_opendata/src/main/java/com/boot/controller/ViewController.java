@@ -66,9 +66,25 @@ public class ViewController {
     // 회원가입 처리
     @PostMapping("/register_ok")
     public String registerOk(@RequestParam Map<String, String> param, Model model) {
+        // 이메일 인증 값 기본 설정
         if (param.get("user_email_chk") == null || param.get("user_email_chk").equals("")) {
             param.put("user_email_chk", "N");
         }
+
+        // 약관 동의 값 정리 (체크박스는 체크 시에만 넘어옴)
+        String serviceYn = param.containsKey("terms_required_service") ? "Y" : "N";
+        String privacyYn = param.containsKey("terms_required_privacy") ? "Y" : "N";
+        String marketingYn = param.containsKey("terms_optional_marketing") ? "Y" : "N";
+
+        // 필수 약관 서버 검증
+        if (!"Y".equals(serviceYn) || !"Y".equals(privacyYn)) {
+            model.addAttribute("msg", "필수 약관에 모두 동의해야 회원가입이 가능합니다.");
+            return "register";
+        }
+
+        param.put("terms_required_service", serviceYn);
+        param.put("terms_required_privacy", privacyYn);
+        param.put("terms_optional_marketing", marketingYn);
 
         int result = userService.register(param);
         if (result == 1) {
