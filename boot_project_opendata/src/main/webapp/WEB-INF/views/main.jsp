@@ -1,4 +1,4 @@
-<!-- 지도 안 뜨면 맨 밑에 main.js 스크립트 주석 -->
+<!-- 지도 안 뜨면 main.js 스크립트 주석 -->
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
@@ -18,6 +18,7 @@
   <!-- Kakao Map SDK -->
   <script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=246b6a1fdd8897003813a81be5f97cd5&libraries=services,clusterer"></script>
   <script src="/js/banner.js"></script>
+  <script src="/js/main.js"></script>
   <!-- ✅ CSS 파일 링크 -->
   <link rel="stylesheet" href="<c:url value='/css/main.css'/>">
   <style>
@@ -974,6 +975,5 @@
 	    setTimeout(updateVisibilityByZoom, 50);
 	});
   </script>
-  <script src="/js/main.js"></script>
 </body>
 </html>
