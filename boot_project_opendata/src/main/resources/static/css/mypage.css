@@ -317,6 +317,18 @@
       color: var(--text);
       margin: 0 0 4px;
     }
+	.board-list-title a {
+	    text-decoration: none !important; /* 밑줄 제거 */
+	    color: inherit !important;        /* 부모 글자 색을 그대로 가져오기 */
+	}
+
+	.board-list-title a:hover,
+	.board-list-title a:visited,
+	.board-list-title a:active {
+	    text-decoration: none !important; /* 어떤 상태에서도 밑줄 제거 */
+	    color: inherit !important;        /* 방문/호버/클릭해도 색 고정 */
+	}
+
     .board-list-meta {
       font-size: 13px;
       color: var(--muted);
