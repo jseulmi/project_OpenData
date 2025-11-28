@@ -351,11 +351,43 @@
   };
 
   /* 🗺️ 지도 기본 설정 */
-  const mapContainer = document.getElementById('kakao-map');
-  const map = new kakao.maps.Map(mapContainer, {
-    center: new kakao.maps.LatLng(37.5665, 126.9780),
-    level: 7
-  });
+   const mapContainer = document.getElementById('kakao-map');
+   const mapOption = {
+       center: new kakao.maps.LatLng(36.2683, 127.6358), 
+       level: 13 
+   };
+
+   const map = new kakao.maps.Map(mapContainer, mapOption);
+   map.setMaxLevel(13);
+   map.setMinLevel(1);
+   
+   kakao.maps.event.addListener(map, 'center_changed', function() {
+       const currentLevel = map.getLevel();
+       
+       if (currentLevel < 13) {
+           return; 
+       }
+       
+       const limitNeLat = 35.9;  // 북쪽 한계
+       const limitSwLat = 34.0;  // 남쪽 한계
+       const limitNeLng = 128.0; // 동쪽 한계
+       const limitSwLng = 127.0; // 서쪽 한계
+
+       const center = map.getCenter();
+       let lat = center.getLat();
+       let lng = center.getLng();
+       let moveRequired = false;
+
+       if (lat > limitNeLat) { lat = limitNeLat; moveRequired = true; }
+       else if (lat < limitSwLat) { lat = limitSwLat; moveRequired = true; }
+
+       if (lng > limitNeLng) { lng = limitNeLng; moveRequired = true; }
+       else if (lng < limitSwLng) { lng = limitSwLng; moveRequired = true; }
+
+       if (moveRequired) {
+           map.setCenter(new kakao.maps.LatLng(lat, lng));
+       }
+   });
   const geocoder = new kakao.maps.services.Geocoder();
 
   /* 전역 상태 */
