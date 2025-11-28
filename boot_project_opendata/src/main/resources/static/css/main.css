@@ -1577,13 +1577,15 @@ main {
 /* 지도 전체 래퍼 스타일 유지 (이전 코드와 함께 사용) */
 .map-wrapper {
   position: relative;
-  width: 95%;
-  height: 90vh;
-  margin: 0 auto;
-  border-radius: 20px;
+  width: 100vw;       /* 전체화면 꽉 차게 */
+  max-width: 100vw;
+  margin: 0;
+  border-radius: 0;   /* 둥근 모서리 원치 않으면 0 */
+  padding: 0;
   overflow: hidden;
-  box-shadow: 0 4px 12px rgb(192, 192, 192);
+  box-shadow: none;   /* 그림자 빼고 싶으면 */
 }
+
 /* 지도 위 제목 */
 .section-title {
   text-align: center;
