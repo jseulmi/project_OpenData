@@ -184,7 +184,7 @@
     <div class="withdraw-container">
       <div class="withdraw-card">
         <h1 class="withdraw-title">회원 탈퇴</h1>
-        
+
         <div class="warning-box">
           <h3>⚠️ 회원 탈퇴 전 주의사항</h3>
           <ul>
@@ -196,25 +196,42 @@
           </ul>
         </div>
 
+        <!-- 에러 메시지 -->
         <c:if test="${not empty error}">
           <div class="error-message">${error}</div>
         </c:if>
 
+        <!-- 🔥 소셜 로그인 판단: LOCAL이 아닐 때만 true -->
+        <c:set var="isSocial" value="${user.login_type ne 'LOCAL'}" />
+
         <form method="post" action="/mypage/withdraw" onsubmit="return confirmWithdraw()">
-          <div class="form-group">
-            <label class="form-label">비밀번호 확인</label>
-            <input type="password" 
-                   name="user_pw" 
-                   class="form-input" 
-                   placeholder="본인 확인을 위해 비밀번호를 입력하세요" 
-                   required>
-          </div>
+
+          <c:choose>
+            <c:when test="${isSocial}">
+              <div class="info-box" style="margin-bottom:20px;">
+                <p>소셜 로그인 회원은 비밀번호 입력 없이 즉시 탈퇴할 수 있습니다.</p>
+              </div>
+            </c:when>
+
+            <c:otherwise>
+              <div class="form-group">
+                <label class="form-label">비밀번호 확인</label>
+                <input type="password"
+                       name="user_pw"
+                       class="form-input"
+                       placeholder="본인 확인을 위해 비밀번호를 입력하세요"
+                       required>
+              </div>
+            </c:otherwise>
+          </c:choose>
 
           <div class="btn-group">
             <button type="submit" class="btn btn-danger">탈퇴하기</button>
             <a href="/mypage" class="btn btn-secondary">취소</a>
           </div>
+
         </form>
+
       </div>
     </div>
   </section>
