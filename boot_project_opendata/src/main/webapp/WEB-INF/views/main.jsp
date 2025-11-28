@@ -129,7 +129,18 @@
         display: none;">
         데이터 로딩중...
       </div>
-		
+	  <div id="sido-hover-box" style="
+	    position:absolute;
+	    top:20px;
+	    left:20px;
+	    padding:12px 18px;
+	    background:white;
+	    border-radius:10px;
+	    box-shadow:0 2px 8px rgba(0,0,0,0.25);
+	    font-size:14px;
+	    display:none;
+	    z-index:2000;
+	  "></div>
        <!-- 지도 위 오버레이 -->
        <div class="map-overlay">
          <div class="overlay-search">
@@ -733,6 +744,7 @@
       const geom = feature.geometry;
       const coords = geom.coordinates;
       const paths = [];
+	  const hoverBox = document.getElementById("sido-hover-box");
 
       if (geom.type === 'Polygon') {
         coords.forEach(poly => {
@@ -757,13 +769,66 @@
       });
 
       polygons.push(polygon);
+	  function getGradeColor(grade) {
+	    switch (grade) {
+	      case 1: return '#1c74ff';   // 좋음 - 파랑
+	      case 2: return '#00a65a';   // 보통 - 초록
+	      case 3: return '#f39c12';   // 나쁨 - 주황
+	      case 4: return '#dd4b39';   // 매우나쁨 - 빨강
+	      default: return '#555';
+	    }
+	  }
 
-      kakao.maps.event.addListener(polygon, 'mouseover', () => {
-        polygon.setOptions({ fillOpacity: 0.8 });
-      });
+	  kakao.maps.event.addListener(polygon, 'mouseover', () => {
+	    polygon.setOptions({ fillOpacity: 0.8 });
 
+	    // ➤ 평균 데이터 가져오기
+	    const sidoData = pmSidoAvg[sidoKey];
+
+	    if (!sidoData) return;
+
+		hoverBox.innerHTML = `
+		  <div style="
+		    font-weight:600;
+		    font-size:14px;
+		    margin-bottom:6px;
+		  ">
+		    \${sidoFull}
+		  </div>
+
+		  <div style="font-size:13px; margin-bottom:3px;">
+		    <span style="color:#555;">미세먼지:</span>
+		    <strong style="color:#1c74ff;">\${sidoData.pm10Value}㎍/㎥</strong>
+		  </div>
+
+		  <div style="font-size:13px; margin-bottom:3px;">
+		    <span style="color:#555;">초미세먼지:</span>
+		    <strong style="color:#1c74ff;">\${sidoData.pm25Value}㎍/㎥</strong>
+		  </div>
+
+		  <div style="font-size:13px; margin-bottom:3px;">
+		    <span style="color:#555;">통합대기지수:</span>
+		    <strong style="color:\${getGradeColor(sidoData.khaiGrade)};">
+		      \${getGradeTextByKhai(sidoData.khaiGrade)}
+		    </strong>
+		  </div>
+
+		  <div style="font-size:11px; color:#777; margin-top:6px;">
+		    측정시간: \${sidoData.dataTime}
+		  </div>
+		`;
+
+	    hoverBox.style.display = 'block';
+	  });
+	  kakao.maps.event.addListener(polygon, 'mousemove', (mouseEvent) => {
+	    const x = mouseEvent.point.x + 15;
+	    const y = mouseEvent.point.y + 15;
+	    hoverBox.style.left = x + 'px';
+	    hoverBox.style.top = y + 'px';
+	  });
       kakao.maps.event.addListener(polygon, 'mouseout', () => {
         polygon.setOptions({ fillOpacity: 0.55 });
+		hoverBox.style.display = 'none';
       });
 
       kakao.maps.event.addListener(polygon, 'click', (mouseEvent) => {
@@ -804,8 +869,20 @@
      ========================================================= */
   // 줌 변경 시: 마커/폴리곤 표시 + 줌 저장
   kakao.maps.event.addListener(map, 'zoom_changed', () => {
-    updateVisibilityByZoom();
-    localStorage.setItem('savedLevel', map.getLevel());
+      updateVisibilityByZoom();
+      localStorage.setItem('savedLevel', map.getLevel());
+
+      // 🔥 지도 확대되면(레벨 <= 9) 시도 정보창 강제로 제거
+      if (map.getLevel() <= 9) {
+          const hoverBox = document.getElementById('sido-hover-box');
+          if (hoverBox) hoverBox.style.display = 'none';
+      }
+
+      // 🔥 시도 클릭 오버레이도 강제 제거
+      if (currentOverlay && currentStationName === 'SIDO_INFO') {
+          currentOverlay.setMap(null);
+          currentOverlay = null;
+      }
   });
 
   // 중심 이동 시: 좌표 저장
