@@ -38,7 +38,7 @@
 - 🚀 **서버 배포** — AWS EC2 기반 서버 구성 및 프로젝트 배포
 
 - 주요 특징  
-  - 🔐 Spring Security + 관리자 전용 OTP 적용
+  -🔐 Spring Security + 관리자 전용 OTP 적용
     → 일반 회원은 세션 로그인
     → 관리자 로그인 시 OTP 2차 인증 적용
   
