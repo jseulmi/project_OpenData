@@ -201,7 +201,7 @@ OAuth2 기반 소셜 로그인 전체 플로우 구현
 <details> <summary><strong>지역 데이터 기반 히트맵 시각화 및 CSV / Excel 다운로드 기능</strong> </summary>
   
 
-https://github.com/user-attachments/assets/64cfa8b2-996b-4496-bfcf-c15a43921995
+https://github.com/user-attachments/assets/266c4276-2483-41de-b34b-05cf91445ac6
 
 
 📌 설명
@@ -228,7 +228,7 @@ https://github.com/user-attachments/assets/64cfa8b2-996b-4496-bfcf-c15a43921995
 <details> <summary><strong>Redis 기반 캐싱 처리</strong> ●</summary>
   
 
-https://github.com/user-attachments/assets/77c11ef0-dc34-40be-b7f6-c76579193929
+https://github.com/user-attachments/assets/231b740e-3b4a-4050-a53b-2690e559d5c7
 
 
 📌 설명
@@ -245,6 +245,11 @@ API 호출 부담 감소
 매일/매시간 단위 스케줄링 가능
 
 </details> <details> <summary><strong>AWS EC2 / 서버 배포</strong> ●</summary>
+  
+
+https://github.com/user-attachments/assets/47f7486c-4c2f-4b3f-9670-5192d88b1f9e
+
+
 📌 설명
 
 Ubuntu 기반 환경 구성
