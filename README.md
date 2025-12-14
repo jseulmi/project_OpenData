@@ -174,6 +174,11 @@ OAuth2 기반 소셜 로그인 전체 플로우 구현
 
 </details> 
 <details> <summary><strong>로그인 / 소셜 로그인(Kakao · Naver · Google)</strong> ●</summary>
+  
+
+https://github.com/user-attachments/assets/f97c4558-39a1-4a84-ad1c-219ca3b1f80c
+
+
 📌 설명
 
 OAuth2 기반 소셜 로그인 전체 플로우 구현
