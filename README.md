@@ -266,22 +266,30 @@ Tomcat 연동
 ## 📬 프로젝트 구조
 
 ```plaintext
-📦 boot_bookstore
-├─ src/main/java/com.bookstore
-│  ├─ controller
-│  ├─ service
-│  ├─ dao
-│  ├─ dto
-│  └─ config
+📦 boot_project_opendata
+├─ src/main/java
+│  ├─ com.boot.client
+│  ├─ com.boot.config
+│  ├─ com.boot.controller
+│  ├─ com.boot.dao
+│  ├─ com.boot.dto
+│  ├─ com.boot.scheduler
+│  ├─ com.boot.security
+│  ├─ com.boot.service
+│  └─ com.boot.util
+│
 ├─ src/main/resources
-│  ├─ mapper
+│  ├─ mybatis.mappers
 │  ├─ static
-│  └─ templates(JSP)
-└─ docs
-   ├─ menu-structure.pdf
-   ├─ ui-design.pdf
-   ├─ erd.pdf
-   └─ table-definition.pdf
+│  ├─ application.properties
+│  └─ mybatis-config.xml
+│ 
+└─ src/main/webapp/WEB-INF
+   └─ views
+      ├─ admin
+      ├─ board
+      ├─ inquiry
+      └─ notice
 ```
 
 ---
