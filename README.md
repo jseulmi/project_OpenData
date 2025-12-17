@@ -187,6 +187,11 @@ OAuth2 기반 소셜 로그인 전체 플로우 구현
 
 </details> 
 <details> <summary><strong>아이디·비밀번호 찾기</strong> ●</summary>
+  
+
+https://github.com/user-attachments/assets/6a2e609e-06a8-4e50-8fb7-e4aa0b904993
+
+
 📌 설명
 
 이메일 기반 인증 코드 발송
@@ -195,6 +200,11 @@ OAuth2 기반 소셜 로그인 전체 플로우 구현
 
 </details>
 <details> <summary><strong>탈퇴 회원 관리 및 계정 상태 관리</strong> ●</summary>
+
+
+https://github.com/user-attachments/assets/d365a481-4a78-4656-9f28-fa7e0df854b0
+
+
 📌 설명
 
 탈퇴 시 실제 삭제가 아닌 상태값 변경 방식
@@ -205,23 +215,19 @@ OAuth2 기반 소셜 로그인 전체 플로우 구현
 🧭 사용자 기능
 <details> <summary><strong>지역 데이터 기반 히트맵 시각화 및 CSV / Excel 다운로드 기능</strong> </summary>
   
-
-https://github.com/user-attachments/assets/266c4276-2483-41de-b34b-05cf91445ac6
-
-
 📌 설명
 
 공공데이터 기반 대기질 정보를 활용해 히트맵 생성
 
 수치에 따라 색상 자동 변경
 
-📸 스크린샷
-
-(이미지)
 
 </details>
 🛠 관리자 기능
 <details> <summary><strong>게시판 관리(공지사항·사용자게시판)</strong> ●</summary>
+
+https://github.com/user-attachments/assets/615a5af3-017a-463b-9a19-702cc39b9d67
+
 📌 설명
 
 관리자 전용 공지사항 CRUD
