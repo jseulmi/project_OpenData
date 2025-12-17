@@ -306,9 +306,8 @@ Tomcat 연동
 각 기능별 동작 방식과 흐름을 직관적으로 확인할 수 있습니다.
 
 ### 📌 전체 시연 영상
-🔗 YouTube 링크: 
-사용자: [https://youtu.be/your-video-url ](https://youtu.be/Hnlj6WZI0oQ 
-관리자: [https://youtu.be/cv0jVy17Loc](https://youtu.be/cv0jVy17Loc)
+🔗 YouTube 링크: https://youtu.be/Hnlj6WZI0oQ (사용자)<br>
+🔗 YouTube 링크: https://youtu.be/cv0jVy17Loc (관리자)
 
 또는  
 🎥 EC2 배포 버전 직접 테스트: [http://3.26.104.30:8484/main](http://3.26.104.30:8484/main)
