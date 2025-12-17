@@ -215,6 +215,10 @@ https://github.com/user-attachments/assets/d365a481-4a78-4656-9f28-fa7e0df854b0
 🧭 사용자 기능
 <details> <summary><strong>지역 데이터 기반 히트맵 시각화 및 CSV / Excel 다운로드 기능</strong> </summary>
 
+
+https://github.com/user-attachments/assets/073a4ec9-f05a-411a-a58e-99cc3a832ef9
+
+
   
 📌 설명
 
