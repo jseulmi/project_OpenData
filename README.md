@@ -214,13 +214,13 @@ https://github.com/user-attachments/assets/d365a481-4a78-4656-9f28-fa7e0df854b0
 </details>
 🧭 사용자 기능
 <details> <summary><strong>지역 데이터 기반 히트맵 시각화 및 CSV / Excel 다운로드 기능</strong> </summary>
+
   
 📌 설명
 
 공공데이터 기반 대기질 정보를 활용해 히트맵 생성
 
 수치에 따라 색상 자동 변경
-
 
 </details>
 🛠 관리자 기능
