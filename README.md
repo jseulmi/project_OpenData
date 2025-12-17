@@ -306,55 +306,12 @@ Tomcat 연동
 각 기능별 동작 방식과 흐름을 직관적으로 확인할 수 있습니다.
 
 ### 📌 전체 시연 영상
-🔗 YouTube 링크: https://youtu.be/your-video-url  
+🔗 YouTube 링크: 
+사용자: [https://youtu.be/your-video-url ](https://youtu.be/Hnlj6WZI0oQ 
+관리자: [https://youtu.be/cv0jVy17Loc](https://youtu.be/cv0jVy17Loc)
+
 또는  
 🎥 EC2 배포 버전 직접 테스트: [http://3.26.104.30:8484/main](http://3.26.104.30:8484/main)
 
 ---
-<!--
-## ✨ 기능별 시연
 
-### 🛒 1. 장바구니 기능
-- 비로그인 장바구니 유지  
-- 로그인 시 DB 장바구니와 병합  
-- 수량 변경 / 삭제  
-<img src="/docs/demo/cart.gif" width="600"/>
-
----
-
-### 💳 2. Toss 결제 프로세스
-- 결제 준비 → 승인 API 처리  
-- 결제 성공 시 주문 자동 생성  
-<img src="/docs/demo/payment.gif" width="600"/>
-
----
-
-### 📦 3. 주문 생성 및 주문 내역 조회
-- 주문 상세 페이지  
-- 구매 이력 확인  
-<img src="/docs/demo/order.gif" width="600"/>
-
----
-
-### 🛍️ 4. 도서 검색 / 카테고리 조회
-- 키워드 기반 검색  
-- 카테고리 필터  
-<img src="/docs/demo/search.gif" width="600"/>
-
----
-
-### 🔐 5. 회원가입 / 로그인 / 로그아웃
-- 아이디 중복 체크  
-- 세션 기반 로그인 처리  
-<img src="/docs/demo/login.gif" width="600"/>
-
----
-
-### 🛠 6. 관리자 페이지
-- 도서 등록 / 수정 / 삭제  
-- 이미지 업로드  
-- 재고 관리  
-<img src="/docs/demo/admin.gif" width="600"/>
-
----
--->
