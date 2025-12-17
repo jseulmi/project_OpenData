@@ -146,7 +146,7 @@
 ## 🗂 ERD 및 테이블 명세서 (PDF)
 
 📄 ERD  
-</details> <details> <summary><strong>ERD 다이어그램</strong> ●</summary>
+</details> <details> <summary><strong>ERD 다이어그램</strong> </summary>
   
 <img width="1256" height="1110" alt="image" src="https://github.com/user-attachments/assets/0f7df47b-a454-498e-87ec-5de1a9bd6295" />
 
@@ -173,7 +173,7 @@ OAuth2 기반 소셜 로그인 전체 플로우 구현
 로그인/로그아웃 및 세션 기반 인증 처리
 
 </details> 
-<details> <summary><strong>로그인 / 소셜 로그인(Kakao · Naver · Google)</strong> ●</summary>
+<details> <summary><strong>로그인 / 소셜 로그인(Kakao · Naver · Google)</strong> </summary>
   
 
 https://github.com/user-attachments/assets/f97c4558-39a1-4a84-ad1c-219ca3b1f80c
@@ -186,7 +186,7 @@ OAuth2 기반 소셜 로그인 전체 플로우 구현
 로그인/로그아웃 및 세션 기반 인증 처리
 
 </details> 
-<details> <summary><strong>아이디·비밀번호 찾기</strong> ●</summary>
+<details> <summary><strong>아이디·비밀번호 찾기</strong> </summary>
   
 
 https://github.com/user-attachments/assets/6a2e609e-06a8-4e50-8fb7-e4aa0b904993
@@ -199,7 +199,7 @@ https://github.com/user-attachments/assets/6a2e609e-06a8-4e50-8fb7-e4aa0b904993
 비밀번호 재설정 기능 구현
 
 </details>
-<details> <summary><strong>탈퇴 회원 관리 및 계정 상태 관리</strong> ●</summary>
+<details> <summary><strong>탈퇴 회원 관리 및 계정 상태 관리</strong> </summary>
 
 
 https://github.com/user-attachments/assets/d365a481-4a78-4656-9f28-fa7e0df854b0
@@ -224,7 +224,7 @@ https://github.com/user-attachments/assets/d365a481-4a78-4656-9f28-fa7e0df854b0
 
 </details>
 🛠 관리자 기능
-<details> <summary><strong>게시판 관리(공지사항·사용자게시판)</strong> ●</summary>
+<details> <summary><strong>게시판 관리(공지사항·사용자게시판)</strong> </summary>
 
 https://github.com/user-attachments/assets/615a5af3-017a-463b-9a19-702cc39b9d67
 
@@ -236,7 +236,7 @@ https://github.com/user-attachments/assets/615a5af3-017a-463b-9a19-702cc39b9d67
 
 </details>
 ⚡ 성능 / 서버 기능
-<details> <summary><strong>Redis 기반 캐싱 처리</strong> ●</summary>
+<details> <summary><strong>Redis 기반 캐싱 처리</strong> </summary>
   
 
 https://github.com/user-attachments/assets/231b740e-3b4a-4050-a53b-2690e559d5c7
@@ -248,14 +248,14 @@ https://github.com/user-attachments/assets/231b740e-3b4a-4050-a53b-2690e559d5c7
 
 API 호출 부담 감소
 
-</details> <details> <summary><strong>Spring Scheduler 기반 자동 업데이트</strong> ●</summary>
+</details> <details> <summary><strong>Spring Scheduler 기반 자동 업데이트</strong> </summary>
 📌 설명
 
 대기질 데이터 자동 수집·저장
 
 매일/매시간 단위 스케줄링 가능
 
-</details> <details> <summary><strong>AWS EC2 / 서버 배포</strong> ●</summary>
+</details> <details> <summary><strong>AWS EC2 / 서버 배포</strong> </summary>
   
 
 https://github.com/user-attachments/assets/47f7486c-4c2f-4b3f-9670-5192d88b1f9e
