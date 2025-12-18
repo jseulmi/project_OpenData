@@ -1,0 +1,60 @@
+-- ===============================
+-- 이용약관 동의 테이블 생성
+-- ===============================
+
+-- 기존 테이블 삭제 (안전 삭제)
+BEGIN 
+    EXECUTE IMMEDIATE 'DROP TABLE user_terms_agreement CASCADE CONSTRAINTS PURGE'; 
+    EXCEPTION WHEN OTHERS THEN NULL; 
+END;
+/
+
+BEGIN 
+    EXECUTE IMMEDIATE 'DROP SEQUENCE USER_TERMS_AGREEMENT_SEQ'; 
+    EXCEPTION WHEN OTHERS THEN NULL; 
+END;
+/
+
+-- 이용약관 동의 테이블 생성
+CREATE TABLE user_terms_agreement (
+    agreement_id      NUMBER         PRIMARY KEY,
+    user_id           VARCHAR2(60)   NOT NULL,
+    terms_type        VARCHAR2(50)   NOT NULL,  -- 'REQUIRED_SERVICE', 'REQUIRED_PRIVACY', 'OPTIONAL_MARKETING'
+    agreed            CHAR(1)        DEFAULT 'Y' NOT NULL,  -- 'Y' or 'N'
+    agreed_date       TIMESTAMP(6)   DEFAULT SYSTIMESTAMP NOT NULL,
+    terms_version      VARCHAR2(20)   DEFAULT '1.0',  -- 약관 버전 관리
+    CONSTRAINT chk_terms_agreed CHECK (agreed IN ('Y', 'N')),
+    CONSTRAINT chk_terms_type CHECK (terms_type IN ('REQUIRED_SERVICE', 'REQUIRED_PRIVACY', 'OPTIONAL_MARKETING'))
+);
+
+-- 시퀀스 생성
+CREATE SEQUENCE USER_TERMS_AGREEMENT_SEQ
+    START WITH 1
+    INCREMENT BY 1
+    NOCACHE
+    NOCYCLE;
+
+-- 외래키 설정 (회원 삭제 시 동의 내역도 삭제)
+ALTER TABLE user_terms_agreement
+    ADD CONSTRAINT fk_terms_user
+    FOREIGN KEY (user_id)
+    REFERENCES opendata_users(user_id)
+    ON DELETE CASCADE;
+
+-- 인덱스 생성 (조회 성능 향상)
+CREATE INDEX idx_terms_user ON user_terms_agreement(user_id);
+CREATE INDEX idx_terms_type ON user_terms_agreement(terms_type);
+
+-- 트리거 생성 (자동 ID 생성)
+CREATE OR REPLACE TRIGGER trg_terms_agreement_id
+BEFORE INSERT ON user_terms_agreement
+FOR EACH ROW
+WHEN (NEW.agreement_id IS NULL)
+BEGIN
+    :NEW.agreement_id := USER_TERMS_AGREEMENT_SEQ.NEXTVAL;
+END;
+/
+
+COMMIT;
+
+
