@@ -179,7 +179,7 @@
 
 ## 🔍 담당 기능
 
-##💬 마이페이지
+## 💬 마이페이지
 
 마이페이지 시연영상 : [https://github.com/user-attachments/assets/b6460b8f-cad2-4be1-91ca-a687748cacbc
 ](https://youtu.be/zhXHyCuCd3Q)
